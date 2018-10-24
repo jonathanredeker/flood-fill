@@ -1,2 +1,2 @@
-# flood-fill
-Pathfinding algorithm on a 2D array
+# Flood Fill
+A Flood Fill pathfinding algorithm on a two-dimensional array
