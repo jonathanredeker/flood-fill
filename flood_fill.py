@@ -17,24 +17,30 @@ class Map:
         return self.collision_map[position[1]][position[0]]
 
     def _print(self, path):
-        """Print maps for demonstration"""
+        """Print maps for demonstration. This method is not crucial; removing it
+           will not effect the search algorithm."""
         map = "\n\n\n"
+
         for i in range(len(self.collision_map)):
             map += "\t"
             for j in range(len(self.collision_map[i])):
                 map += str(self.collision_map[i][j]) + "  "
             map += "\n\n"
+
         for point in path:
             a = point[1]
             b = point[0]
             self.collision_map[a][b] = "@"
+
         for i in range(len(self.collision_map)):
             for j in range(len(self.collision_map[i])):
                 if self.collision_map[i][j] == 0:
                     self.collision_map[i][j] = " "
                 elif self.collision_map[i][j] == 1:
                     self.collision_map[i][j] = "."
+
         map += "\n\n\n"
+        
         for i in range(len(self.collision_map)):
             map += "\t"
             for j in range(len(self.collision_map[i])):
@@ -44,13 +50,15 @@ class Map:
         print map
 
 class Node():
-    """These Nodes will spread throughout the map and collect the coordinates for our path"""
+    """These Nodes will spread throughout the map and collect the coordinates
+       for our path"""
     def __init__(self, parent, position):
         self.path = []
         self.parent = parent
         self.position = position
 
-        # If the Node has a parent, then it will inherit all coordinates from the parent's path.
+        # If the Node has a parent, then it will inherit all coordinates from
+        # the parent's path.
         if self.parent != None:
             for coordinate in parent.path:
                 self.path.append(coordinate)
@@ -59,7 +67,8 @@ class Node():
         self.path.append(self.position)
 
 class Pathfinder():
-    """This is our pathfinding class that will search for and return the requested path."""
+    """This is our pathfinding class that will search for and return the
+       requested path."""
     def __init__(self, map, start):
         self.path = []
         self.checked_steps = []
@@ -87,16 +96,21 @@ class Pathfinder():
                 # Node looks at a step in the given direction
                 step = self.node_look(direction)
 
-                # If the step is real (not out-of-bounds), else move on to next node
+                # If the step is real (not out-of-bounds), else move on to next
+                # node
                 if self.step_is_real(step):
 
-                    # If check if the step has already been analyzed, else move on to the next node
+                    # If check if the step has already been analyzed, else move
+                    # on to the next node
                     if self.step_is_checked(step) == False:
 
-                        # If there are no obstacles in or around the step, else move on to the next node
-                        if self.check_for_obstacle(self.current_node.position, step, direction) == False:
+                        # If there are no obstacles in or around the step, else
+                        # move on to the next node
+                        if self.check_for_obstacle(self.current_node.position, \
+                        step, direction) == False:
 
-                            # Queue new node, pass current node as the parent of the next node
+                            # Queue new node, pass current node as the parent of
+                            # the next node
                             self.queue_node(self.current_node, step)
 
                             # If our step is the goal
@@ -107,15 +121,19 @@ class Pathfinder():
                                 self.current_node.path.append(step)
                                 return self.current_node.path
 
-            # Close the node by popping it from the queued_nodes list and adding it to the closed_nodes list
+            # Close the node by popping it from the queued_nodes list and adding
+            # it to the closed_nodes list
             self.close_node()
 
         # We could not reach the goal, therefore return an empty path
         return []
 
     def node_look(self, direction):
+        """The Node looks in a certain direction and returns its coordinate.
+           It searches clock-wise, starting from 12-o-clock"""
+        # Create a coordinate for the Node to check
         step = self.current_node.position
-        # Node searches clock-wise, starting from 12-o-clock
+
         if direction == 0:
             # [x, y - 1]
             return [step[0], step[1] - 1]
@@ -159,10 +177,12 @@ class Pathfinder():
             return True
 
     def check_step(self, step):
+        """Add the given step to our list of checked steps to prevent
+           unnecessary checks"""
         self.checked_steps.append(step)
 
     def step_is_checked(self, step):
-        """Check if step is in checked_steps. If not, add it to the list."""
+        """Check if step is in checked_steps. If not, add it to the list"""
         if step in self.checked_steps:
             return True
         else:
@@ -174,11 +194,15 @@ class Pathfinder():
         if self.map.get_element(step) == 1:
             return True
         else:
-            #Checks for diagonal obstacles between Node's position and the requested step"""
+            # Checks for diagonal obstacles between Node's position and the
+            # requested step
             if direction % 2:
-                obstacle_x, obstacle_y = [position[0], step[1]], [step[0], position[1]]
-                if self.map.get_element(obstacle_x) == 1 and self.map.get_element(obstacle_y) == 1:
+                obstacle_x, obstacle_y = [position[0], step[1]], [step[0], \
+                position[1]]
+                if self.map.get_element(obstacle_x) == 1 \
+                and self.map.get_element(obstacle_y) == 1:
                     return True
+
             return False
 
     def step_is_goal(self, step):
