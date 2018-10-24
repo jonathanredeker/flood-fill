@@ -44,14 +44,13 @@ class Map:
         print map
 
 class Node():
-    """These Nodes will spread throughout the map"""
+    """These Nodes will spread throughout the map and collect the coordinates for our path"""
     def __init__(self, parent, position):
         self.path = []
         self.parent = parent
         self.position = position
 
-        # If the Node's parent is not equal to None, then it will
-        # inherit all coordinates from the parent's path.
+        # If the Node has a parent, then it will inherit all coordinates from the parent's path.
         if self.parent != None:
             for coordinate in parent.path:
                 self.path.append(coordinate)
@@ -71,40 +70,52 @@ class Pathfinder():
         self.solved = False
 
     def search(self):
+        """The main loop that iterates through each possible step"""
+        # Queue initial node and  add to checked steps list
         self.queue_node(None, self.start)
         self.check_step(self.start)
 
+        # While our list of queued_nodes is not empty and reached the goal
         while self.queued_nodes != [] and self.solved == False:
 
+            # Set current_node to the first node in the queued_nodes list
             self.current_node = self.queued_nodes[0]
 
+            # We want to each of the 8 positions around the node
             for direction in range(8):
 
-                step = self.move_node(direction)
+                # Node looks at a step in the given direction
+                step = self.node_look(direction)
 
+                # If the step is real (not out-of-bounds), else move on to next node
                 if self.step_is_real(step):
 
+                    # If check if the step has already been analyzed, else move on to the next node
                     if self.step_is_checked(step) == False:
 
-                        if self.step_is_obstacle(self.current_node.position, step, direction) == False:
+                        # If there are no obstacles in or around the step, else move on to the next node
+                        if self.check_for_obstacle(self.current_node.position, step, direction) == False:
 
-                            # Queue new node
+                            # Queue new node, pass current node as the parent of the next node
                             self.queue_node(self.current_node, step)
 
+                            # If our step is the goal
                             if self.step_is_goal(step):
+
                                 # Return path self.current_node.path
                                 self.solved = True
                                 self.current_node.path.append(step)
                                 return self.current_node.path
 
+            # Close the node by popping it from the queued_nodes list and adding it to the closed_nodes list
             self.close_node()
 
         # We could not reach the goal, therefore return an empty path
         return []
 
-    def move_node(self, direction):
+    def node_look(self, direction):
         step = self.current_node.position
-        # Node searches clock-wise
+        # Node searches clock-wise, starting from 12-o-clock
         if direction == 0:
             # [x, y - 1]
             return [step[0], step[1] - 1]
@@ -158,12 +169,12 @@ class Pathfinder():
             self.check_step(step)
             return False
 
-    def step_is_obstacle(self, position, step, direction):
+    def check_for_obstacle(self, position, step, direction):
         """Check if the step an obstacle"""
         if self.map.get_element(step) == 1:
             return True
         else:
-            """Checks for diagonal obstacles between Node's position and the requested step"""
+            #Checks for diagonal obstacles between Node's position and the requested step"""
             if direction % 2:
                 obstacle_x, obstacle_y = [position[0], step[1]], [step[0], position[1]]
                 if self.map.get_element(obstacle_x) == 1 and self.map.get_element(obstacle_y) == 1:
@@ -171,6 +182,7 @@ class Pathfinder():
             return False
 
     def step_is_goal(self, step):
+        """Checks if the map element at the given position is the goal value"""
         if self.map.get_element(step) == 2:
             return True
         else:
