@@ -167,7 +167,6 @@ class Pathfinder():
             if direction % 2:
                 obstacle_x, obstacle_y = [position[0], step[1]], [step[0], position[1]]
                 if self.map.get_element(obstacle_x) == 1 and self.map.get_element(obstacle_y) == 1:
-                    print position, ":", obstacle_x, obstacle_y
                     return True
             return False
 
@@ -180,6 +179,8 @@ class Pathfinder():
 map = Map()
 pathfinder = Pathfinder(map, [4,3])
 path = pathfinder.search()
+
+# Print demonstration
 map._print(path)
 print path
 if len(path):
