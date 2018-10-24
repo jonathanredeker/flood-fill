@@ -165,11 +165,7 @@ class Pathfinder():
         else:
             """Checks for diagonal obstacles between Node's position and the requested step"""
             if direction % 2:
-                obstacle_x, obstacle_y = [], []
-                obstacle_x.append(step[0] + (position[0] - step[0]))
-                obstacle_x.append(step[1])
-                obstacle_y.append(step[0])
-                obstacle_y.append(step[1] + (position[1] - step[1]))
+                obstacle_x, obstacle_y = [position[0], step[1]], [step[0], position[1]]
                 if self.map.get_element(obstacle_x) == 1 and self.map.get_element(obstacle_y) == 1:
                     print position, ":", obstacle_x, obstacle_y
                     return True
