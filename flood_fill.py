@@ -75,13 +75,16 @@ class Pathfinder():
         self.queue_node(None, self.start)
         self.check_step(self.start)
 
-        # While our list of queued_nodes is not empty and reached the goal
+        # While our list of queued_nodes is not empty and hasn't reached the goal
         while self.queued_nodes != [] and self.solved == False:
 
             # Set current_node to the first node in the queued_nodes list
             self.current_node = self.queued_nodes[0]
 
-            # We want to each of the 8 positions around the node
+            # We want to check each of the 8 positions around the node, N stands for the origin of the Node
+            # [7][0][1]
+            # [6][N][2]
+            # [5][4][3]
             for direction in range(8):
 
                 # Node looks at a step in the given direction
