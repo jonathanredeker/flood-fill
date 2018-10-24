@@ -6,10 +6,10 @@ class Map:
         1 - Obstacle
         2 - Goal
         """
-        self.collision_map = [[0,1,0,0,0],
+        self.collision_map = [[2,1,0,0,0],
                               [0,1,1,0,0],
                               [0,0,1,0,0],
-                              [1,1,0,0,2]]
+                              [1,0,0,0,0]]
         self.width = len(self.collision_map[0])
         self.height = len(self.collision_map)
 
@@ -17,6 +17,7 @@ class Map:
         return self.collision_map[position[1]][position[0]]
 
     def _print(self, path):
+        """Print maps for demonstration"""
         map = "\n\n\n"
         for i in range(len(self.collision_map)):
             map += "\t"
@@ -40,7 +41,6 @@ class Map:
                 map += str(self.collision_map[i][j]) + "  "
             map += "\n\n"
 
-
         print map
 
 class Node():
@@ -61,18 +61,18 @@ class Node():
 
 class Pathfinder():
     """This is our pathfinding class that will search for and return the requested path."""
-    def __init__(self, map):
+    def __init__(self, map, start):
         self.path = []
         self.checked_steps = []
         self.queued_nodes = []
         self.closed_nodes = []
         self.map = map
+        self.start = start
         self.solved = False
 
     def search(self):
-        start = [0,0]
-        self.queue_node(None, start)
-        self.check_step(start)
+        self.queue_node(None, self.start)
+        self.check_step(self.start)
 
         while self.queued_nodes != [] and self.solved == False:
 
@@ -86,7 +86,7 @@ class Pathfinder():
 
                     if self.step_is_checked(step) == False:
 
-                        if self.step_is_obstacle(step, direction) == False:
+                        if self.step_is_obstacle(self.current_node.position, step, direction) == False:
 
                             # Queue new node
                             self.queue_node(self.current_node, step)
@@ -151,19 +151,28 @@ class Pathfinder():
         self.checked_steps.append(step)
 
     def step_is_checked(self, step):
-        """Check if step is in checked_steps.
-           If not, add it to the list."""
+        """Check if step is in checked_steps. If not, add it to the list."""
         if step in self.checked_steps:
             return True
         else:
             self.check_step(step)
             return False
 
-    def step_is_obstacle(self, step, direction):
-
+    def step_is_obstacle(self, position, step, direction):
+        """Check if the step an obstacle"""
         if self.map.get_element(step) == 1:
             return True
         else:
+            """Checks for diagonal obstacles between Node's position and the requested step"""
+            if direction % 2:
+                obstacle_x, obstacle_y = [], []
+                obstacle_x.append(step[0] + (position[0] - step[0]))
+                obstacle_x.append(step[1])
+                obstacle_y.append(step[0])
+                obstacle_y.append(step[1] + (position[1] - step[1]))
+                if self.map.get_element(obstacle_x) == 1 and self.map.get_element(obstacle_y) == 1:
+                    print position, ":", obstacle_x, obstacle_y
+                    return True
             return False
 
     def step_is_goal(self, step):
@@ -173,7 +182,7 @@ class Pathfinder():
             return False
 
 map = Map()
-pathfinder = Pathfinder(map)
+pathfinder = Pathfinder(map, [4,3])
 path = pathfinder.search()
 map._print(path)
 print path
