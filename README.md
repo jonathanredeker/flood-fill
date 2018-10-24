@@ -5,4 +5,5 @@ A Flood Fill pathfinding algorithm on a two-dimensional array
 
 ### To-do
 - [x] Solve bug that allows the player to traverse between two diagonally adjacent obstacles
+- [ ] Allow the algorithm to check a non-rectangular/uneven map
 - [ ] Optimize for speed; current execution time is 150ms
