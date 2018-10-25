@@ -1,6 +1,12 @@
 # Flood Fill
 A Flood Fill pathfinding algorithm for 2D and 3D spaces.
 
+![alt text](https://github.com/jonathanredeker/flood-fill/model_example.png "3d_model.py modelling the solved path and obstacles")
+
+## Requirements
+- Matplotlib (3d_model.py)
+- NumPy (3d_model.py)
+
 ## flood_fill.py
 
 ### To-do
@@ -19,6 +25,6 @@ Let's visit another dimension! How about 3D space?
 
 ### To-do
 - [ ] :bug: Solve bug in method Pathfinder.check_for_obstacle() that allows the Node to make illegal moves
-- [-] Create 3D model to aid debugging
+- [-] Create a 3D graphing model to aid debugging
 - [ ] Export Map.collision_map and Pathfinder.path to be imported by 3d_model.py
 - [ ] Find a way to make Pathfinder.node_look() less bloated and more efficient

@@ -49,7 +49,7 @@ print obstacles
 print path
 
 figure = plot.figure()
-ax = figure.add_subplot(111, projection='3d', title="Path & Obstacles")
+ax = figure.add_subplot(111, projection='3d', title="Solved Path & Obstacles")
 
 ax.plot(x, y, z, c="b", marker=".")
 ax.plot([x[0]], [y[0]], [z[0]], c="g", marker="o")
