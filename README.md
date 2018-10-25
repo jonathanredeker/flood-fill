@@ -25,6 +25,6 @@ Let's visit another dimension! How about 3D space?
 
 ### To-do
 - [ ] :bug: Solve bug in method Pathfinder.check_for_obstacle() that allows the Node to make illegal moves
-- [-] Create a 3D graphing model to aid debugging
+- [x] Create a 3D graphing model to aid debugging
 - [ ] Export Map.collision_map and Pathfinder.path to be imported by 3d_model.py
 - [ ] Find a way to make Pathfinder.node_look() less bloated and more efficient
