@@ -7,9 +7,9 @@ class Map:
         2 - Goal
         """
         self.collision_map = [[2,1,0,0,0],
-                              [0,1,1,0,0],
-                              [0,0,1,0,0],
-                              [1,0,0,0,0]]
+                              [0,1,0,1,0],
+                              [0,1,0,1,0],
+                              [0,0,0,1,0]]
         self.width = len(self.collision_map[0])
         self.height = len(self.collision_map)
 

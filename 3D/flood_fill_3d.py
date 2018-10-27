@@ -1,3 +1,5 @@
+import json
+
 class Map:
     """A 3D map to test our program on"""
     def __init__(self):
@@ -6,30 +8,26 @@ class Map:
         1 - Obstacle
         2 - Goal
         """
-        self.collision_map = [[[2,1,0,0,0],
-                               [1,1,1,0,0],
-                               [1,0,1,0,0],
-                               [1,0,0,0,0]],
-                              [[0,1,0,0,0],
-                               [0,1,1,0,0],
+        self.collision_map = [[[2,0,0,0,0],
+                               [0,0,0,0,0],
                                [0,0,1,0,0],
-                               [1,0,0,0,0]],
-                              [[0,1,0,0,0],
-                               [0,1,1,0,0],
+                               [0,0,0,0,0]],
+                              [[0,0,0,0,0],
                                [0,0,1,0,0],
-                               [1,0,0,0,0]]]
+                               [0,1,0,1,0],
+                               [0,0,1,0,0]],
+                              [[0,0,0,0,0],
+                               [0,0,0,0,0],
+                               [0,0,0,0,0],
+                               [0,0,0,0,0]]]
 
         self.length = len(self.collision_map[0][0])
         self.width = len(self.collision_map[0])
         self.height = len(self.collision_map)
 
     def get_element(self, position):
+        """Returns the element from a coordinate on the collision_map"""
         return self.collision_map[position[2]][position[1]][position[0]]
-
-    def _print(self, path):
-        """Prints layers of 3D map for demonstration. Maybe plot a path on a
-        3D graph with numpy and matplotlib."""
-        pass
 
 class Node():
     """These Nodes will spread throughout the map and collect the coordinates
@@ -50,18 +48,20 @@ class Node():
 
 class Pathfinder():
     """This is our pathfinding class that will search for and return the
-       requested path."""
-    def __init__(self, map, start):
+       requested path"""
+    def __init__(self, map):
         self.path = []
         self.checked_steps = []
         self.queued_nodes = []
         self.closed_nodes = []
         self.map = map
-        self.start = start
         self.solved = False
 
-    def search(self):
+    def search(self, start):
         """The main loop that iterates through each possible step"""
+        # Store our start as a part of the object
+        self.start = start
+
         # Queue initial node and  add to checked steps list
         self.queue_node(None, self.start)
         self.check_step(self.start)
@@ -87,9 +87,9 @@ class Pathfinder():
                     # on to the next node
                     if self.step_is_checked(step) == False:
 
-                        # If there are no obstacles in or around the step, else
-                        # move on to the next node
-                        if self.check_for_obstacle(self.current_node.position, \
+                        # If there are no collisions between Node position and
+                        # then step, else move on to the next node
+                        if self.check_for_collision(self.current_node.position,\
                         step, direction) == False:
 
                             # Queue new node, pass current node as the parent of
@@ -220,7 +220,7 @@ class Pathfinder():
 
     def check_step(self, step):
         """Add the given step to our list of checked steps to prevent
-           unnecessary checks"""
+           redundant checks"""
         self.checked_steps.append(step)
 
     def step_is_checked(self, step):
@@ -231,11 +231,34 @@ class Pathfinder():
             self.check_step(step)
             return False
 
-    def check_for_obstacle(self, position, step, direction):
-        """Check if the step an obstacle"""
+    def check_for_collision(self, position, step, direction):
+        """Check if there is a collision between position and step"""
         if self.map.get_element(step) == 1:
             return True
         else:
+            # We are checking to see if we illegally cross through a surface
+            # created with the points of the obstacles between the Node's
+            # position and its step.
+            if (direction > 0 and direction < 9) or direction > 16:
+                obstacle_p1 = [step[0], position[1], position[2]]
+                obstacle_p2 = [position[0], step[1], position[2]]
+                obstacle_p3 = [position[0], position[1], step[2]]
+                obstacle_p4 = [step[0], step[1], position[2]]
+                if (self.map.get_element(obstacle_p1) == 1 \
+                and self.map.get_element(obstacle_p2) == 1 \
+                and self.map.get_element(obstacle_p3) == 1) \
+                or (self.map.get_element(obstacle_p3) == 1 \
+                and self.map.get_element(obstacle_p4) == 1):
+                    return True
+            # We are checking to see if the Node is passing between two
+            # obstacles diagonally on the Node's z-axis.
+            elif (direction > 8 and direction < 17) and direction % 2 == 0:
+                obstacle_p1, obstacle_p2 = [position[0], step[1], position[2]],\
+                [step[0], position[1], position[2]]
+
+                if self.map.get_element(obstacle_p1) == 1 and self.map.get_element(obstacle_p2) == 1:
+                    return True
+
             return False
 
     def step_is_goal(self, step):
@@ -245,14 +268,25 @@ class Pathfinder():
         else:
             return False
 
+# Instantiate Map() and Pathfinder()
 map = Map()
-pathfinder = Pathfinder(map, [4,3,2])
-path = pathfinder.search()
+pathfinder = Pathfinder(map)
 
-# Print demonstration
-map._print(path)
-print path
+# Search starting from the coordinate [x, y, z]
+path = pathfinder.search([2, 2, 1])
+
+# Store the collision map and path as json
+data = json.dumps({"map": map.collision_map, "path": path})
+
+# Write the data to a json file for 3d_model.py to interpret
+with open("flood_fill_3d.json", "w") as file:
+    file.write(data)
+    print "\n\tData saved to flood_fill_3d.json\n"
+
+# - - - - - - - - - - - - - - Print Demonstration - - - - - - - - - - - - - - #
+
+print "\t" + str(path)
 if len(path):
-    print "Total steps to goal:", str(len(path) - 1), "\n"
+    print "\tTotal steps to goal:", str(len(path) - 1), "\n"
 else:
-    print "Total steps to goal: 0"
+    print "\tTotal steps to goal: 0"
