@@ -80,8 +80,8 @@ if data["path"]:
 # Scatter/plot the obstacles as black squares.
 ax.scatter(x2, y2, z2, c="black", marker="s")
 
-# For debugging collision check
-#ax.plot_trisurf([2,2,3],[2,3,2],[0,1,1], cmap='Pastel1', edgecolor='none')
+# For debugging collision checks
+#ax.plot_trisurf([2,1,2],[1,2,2],[1,1,2], cmap='Pastel1', edgecolor='none')
 #ax.plot_trisurf([2,2,1],[2,1,2],[0,1,1], cmap='summer', edgecolor='none')
 #ax.plot_trisurf([2,2,1],[2,3,2],[0,1,1], cmap='Wistia', edgecolor='none')
 #ax.plot_trisurf([2,2,3],[2,1,2],[0,1,1], cmap='autumn', edgecolor='none')

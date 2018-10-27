@@ -4,8 +4,19 @@ A Flood Fill pathfinding algorithm for 2D and 3D spaces.
 ![alt text](https://raw.githubusercontent.com/jonathanredeker/flood-fill/master/model_example.png "3d_model.py modelling the solved path and obstacles")
 
 ## Requirements
-- Matplotlib (3d_model.py)
-- NumPy (3d_model.py)
+flood_fill.py:
+```
+N/A
+```
+flood_fill_3d.py:
+```
+N/A
+```
+3d_model.py
+```
+- Matplotlib
+- NumPy
+```
 
 ## flood_fill.py
 

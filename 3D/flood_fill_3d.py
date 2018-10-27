@@ -8,18 +8,18 @@ class Map:
         1 - Obstacle
         2 - Goal
         """
-        self.collision_map = [[[2,0,0,0,0],
-                               [0,0,0,0,0],
-                               [0,0,1,0,0],
-                               [0,0,0,0,0]],
-                              [[0,0,0,0,0],
-                               [0,0,1,0,0],
+        self.collision_map = [[[0,1,0,0,0],
+                               [0,1,1,0,0],
                                [0,1,0,1,0],
                                [0,0,1,0,0]],
-                              [[0,0,0,0,0],
-                               [0,0,0,0,0],
-                               [0,0,0,0,0],
-                               [0,0,0,0,0]]]
+                              [[1,0,0,0,0],
+                               [0,0,1,0,0],
+                               [1,1,0,1,1],
+                               [0,1,1,1,0]],
+                              [[0,1,0,0,0],
+                               [0,1,1,0,0],
+                               [1,1,0,1,1],
+                               [2,1,0,0,0]]]
 
         self.length = len(self.collision_map[0][0])
         self.width = len(self.collision_map[0])
@@ -64,7 +64,7 @@ class Pathfinder():
 
         # Queue initial node and  add to checked steps list
         self.queue_node(None, self.start)
-        self.check_step(self.start)
+        self.check_step(self.start, self.start)
 
         # While our list of queued_nodes is not empty and hasn't reached
         # the goal
@@ -85,7 +85,8 @@ class Pathfinder():
 
                     # If check if the step has already been analyzed, else move
                     # on to the next node
-                    if self.step_is_checked(step) == False:
+                    if self.step_is_checked(step, self.current_node.position) \
+                    == False:
 
                         # If there are no collisions between Node position and
                         # then step, else move on to the next node
@@ -218,17 +219,20 @@ class Pathfinder():
         else:
             return True
 
-    def check_step(self, step):
+    def check_step(self, step, position):
         """Add the given step to our list of checked steps to prevent
-           redundant checks"""
-        self.checked_steps.append(step)
+           redundant checks. We leave behind a "signature" of the Node
+           who checked it, that way we can still check this step from other
+           positions. Without this "signature", the algorithm will get caught
+           in a loop if it cannot find the goal."""
+        self.checked_steps.append([step, position])
 
-    def step_is_checked(self, step):
+    def step_is_checked(self, step, position):
         """Check if step is in checked_steps. If not, add it to the list"""
-        if step in self.checked_steps:
+        if [step, position] in self.checked_steps:
             return True
         else:
-            self.check_step(step)
+            self.check_step(step, position)
             return False
 
     def check_for_collision(self, position, step, direction):
@@ -238,27 +242,37 @@ class Pathfinder():
         else:
             # We are checking to see if we illegally cross through a surface
             # created with the points of the obstacles between the Node's
-            # position and its step.
+            # position and its step. # or direction > 16
+            obstacle_p1 = [step[0], position[1], position[2]] # SNN
+            obstacle_p2 = [position[0], step[1], position[2]] # NSN
+            obstacle_p3 = [position[0], position[1], step[2]] # NNS
+            obstacle_p4 = [step[0], step[1], position[2]]     # SSN
+            obstacle_p5 = [step[0], position[1], step[2]]     # SNS
+            obstacle_p6 = [position[0], step[1], step[2]]     # NSS
             if (direction > 0 and direction < 9) or direction > 16:
-                obstacle_p1 = [step[0], position[1], position[2]]
-                obstacle_p2 = [position[0], step[1], position[2]]
-                obstacle_p3 = [position[0], position[1], step[2]]
-                obstacle_p4 = [step[0], step[1], position[2]]
                 if (self.map.get_element(obstacle_p1) == 1 \
                 and self.map.get_element(obstacle_p2) == 1 \
-                and self.map.get_element(obstacle_p3) == 1) \
-                or (self.map.get_element(obstacle_p3) == 1 \
-                and self.map.get_element(obstacle_p4) == 1):
+                and self.map.get_element(obstacle_p3) == 1):
                     return True
+                if (self.map.get_element(obstacle_p3) == 1 \
+                and self.map.get_element(obstacle_p1) == 1):
+                    #print obstacle_p1, obstacle_p2, obstacle_p3, obstacle_p4, obstacle_p5, obstacle_p6
+                    return True
+                if (self.map.get_element(obstacle_p2) == 1 \
+                and self.map.get_element(obstacle_p1) == 1 \
+                and self.map.get_element(obstacle_p5) == 1 \
+                and self.map.get_element(obstacle_p6) == 1):
+                    #print obstacle_p1, obstacle_p2, obstacle_p3, obstacle_p4, obstacle_p5, obstacle_p6
+                    return True
+
             # We are checking to see if the Node is passing between two
             # obstacles diagonally on the Node's z-axis.
             elif (direction > 8 and direction < 17) and direction % 2 == 0:
-                obstacle_p1, obstacle_p2 = [position[0], step[1], position[2]],\
-                [step[0], position[1], position[2]]
-
                 if self.map.get_element(obstacle_p1) == 1 and self.map.get_element(obstacle_p2) == 1:
-                    return True
 
+                    #print obstacle_p1, obstacle_p2, obstacle_p3, obstacle_p4, obstacle_p5, obstacle_p6
+                    return True
+            #print position, step
             return False
 
     def step_is_goal(self, step):
